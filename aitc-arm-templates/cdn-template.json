@@ -1,0 +1,187 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "profiles_aitc_cdn_name": {
+            "defaultValue": "aitc-cdn",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Cdn/profiles",
+            "apiVersion": "2024-06-01-preview",
+            "name": "[parameters('profiles_aitc_cdn_name')]",
+            "location": "Global",
+            "sku": {
+                "name": "Standard_Microsoft"
+            },
+            "kind": "cdn",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints",
+            "apiVersion": "2024-06-01-preview",
+            "name": "[concat(parameters('profiles_aitc_cdn_name'), '/aitcendpoint')]",
+            "location": "Global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_aitc_cdn_name'))]"
+            ],
+            "properties": {
+                "originHostHeader": "aitcstorage01.z13.web.core.windows.net",
+                "contentTypesToCompress": [
+                    "application/eot",
+                    "application/font",
+                    "application/font-sfnt",
+                    "application/javascript",
+                    "application/json",
+                    "application/opentype",
+                    "application/otf",
+                    "application/pkcs7-mime",
+                    "application/truetype",
+                    "application/ttf",
+                    "application/vnd.ms-fontobject",
+                    "application/xhtml+xml",
+                    "application/xml",
+                    "application/xml+rss",
+                    "application/x-font-opentype",
+                    "application/x-font-truetype",
+                    "application/x-font-ttf",
+                    "application/x-httpd-cgi",
+                    "application/x-javascript",
+                    "application/x-mpegurl",
+                    "application/x-opentype",
+                    "application/x-otf",
+                    "application/x-perl",
+                    "application/x-ttf",
+                    "font/eot",
+                    "font/ttf",
+                    "font/otf",
+                    "font/opentype",
+                    "image/svg+xml",
+                    "text/css",
+                    "text/csv",
+                    "text/html",
+                    "text/javascript",
+                    "text/js",
+                    "text/plain",
+                    "text/richtext",
+                    "text/tab-separated-values",
+                    "text/xml",
+                    "text/x-script",
+                    "text/x-component",
+                    "text/x-java-source"
+                ],
+                "isCompressionEnabled": true,
+                "isHttpAllowed": true,
+                "isHttpsAllowed": true,
+                "queryStringCachingBehavior": "UseQueryString",
+                "origins": [
+                    {
+                        "name": "aitcstorage01-z13-web-core-windows-net",
+                        "properties": {
+                            "hostName": "aitcstorage01.z13.web.core.windows.net",
+                            "httpPort": 80,
+                            "httpsPort": 443,
+                            "originHostHeader": "aitcstorage01.z13.web.core.windows.net",
+                            "priority": 1,
+                            "weight": 1000,
+                            "enabled": true
+                        }
+                    }
+                ],
+                "originGroups": [],
+                "geoFilters": [
+                    {
+                        "relativePath": "/",
+                        "action": "Block",
+                        "countryCodes": [
+                            "NG",
+                            "KP",
+                            "RU",
+                            "RO",
+                            "PL",
+                            "IN"
+                        ]
+                    }
+                ],
+                "deliveryPolicy": {
+                    "rules": [
+                        {
+                            "name": "httpsredirect",
+                            "order": 1,
+                            "conditions": [
+                                {
+                                    "name": "RequestScheme",
+                                    "parameters": {
+                                        "typeName": "DeliveryRuleRequestSchemeConditionParameters",
+                                        "matchValues": [
+                                            "HTTP"
+                                        ],
+                                        "operator": "Equal",
+                                        "negateCondition": false,
+                                        "transforms": []
+                                    }
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "name": "UrlRedirect",
+                                    "parameters": {
+                                        "typeName": "DeliveryRuleUrlRedirectActionParameters",
+                                        "redirectType": "Moved",
+                                        "destinationProtocol": "Https",
+                                        "customHostname": "www.ahmedharrisresume.com"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints/customdomains",
+            "apiVersion": "2024-06-01-preview",
+            "name": "[concat(parameters('profiles_aitc_cdn_name'), '/aitcendpoint/ahmedharrisresume-com')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_aitc_cdn_name'), 'aitcendpoint')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_aitc_cdn_name'))]"
+            ],
+            "properties": {
+                "hostName": "ahmedharrisresume.com"
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints/customdomains",
+            "apiVersion": "2024-06-01-preview",
+            "name": "[concat(parameters('profiles_aitc_cdn_name'), '/aitcendpoint/www-ahmedharrisresume-com')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_aitc_cdn_name'), 'aitcendpoint')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_aitc_cdn_name'))]"
+            ],
+            "properties": {
+                "hostName": "www.ahmedharrisresume.com"
+            }
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints/origins",
+            "apiVersion": "2024-06-01-preview",
+            "name": "[concat(parameters('profiles_aitc_cdn_name'), '/aitcendpoint/aitcstorage01-z13-web-core-windows-net')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles/endpoints', parameters('profiles_aitc_cdn_name'), 'aitcendpoint')]",
+                "[resourceId('Microsoft.Cdn/profiles', parameters('profiles_aitc_cdn_name'))]"
+            ],
+            "properties": {
+                "hostName": "aitcstorage01.z13.web.core.windows.net",
+                "httpPort": 80,
+                "httpsPort": 443,
+                "originHostHeader": "aitcstorage01.z13.web.core.windows.net",
+                "priority": 1,
+                "weight": 1000,
+                "enabled": true
+            }
+        }
+    ]
+}
